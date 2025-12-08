@@ -3,28 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/kelindar/search"
+	"github.com/tommylay1902/vcalendar/seed"
 )
 
 func main() {
-	m, err := search.NewVectorizer("./dist/all-minilm-l6-v2-q8_0.gguf", 1)
-	if err != nil {
-		// handle error
-		fmt.Println("hello")
-	}
-	embedding, err := m.EmbedText("Add event to my calendar")
-	index := search.NewIndex[string]()
-	index.Add(embedding, "Add event to my calendar")
-
-	results := index.Search(embedding, 10)
-	for _, r := range results {
-		fmt.Printf("Result: %s (Relevance: %.2f)\n", r.Value, r.Relevance)
-	}
-
-	// embedding2, err := m.EmbedText("Delete event from my calendar")
-	// index.Add(embedding2, "Delete event from my calendar")
-
-	defer m.Close()
+	seed.SeedGCOperations()
 	// 	devNull, _ := os.OpenFile("/dev/null", os.O_WRONLY, 0666)
 	// 	syscall.Dup2(int(devNull.Fd()), int(os.Stderr.Fd()))
 	// 	devNull.Close()

@@ -49,7 +49,7 @@ func WriteWebsocket(messageChan chan any, errorChan chan error, doneChan chan st
 	}
 }
 
-func RecordAudio(embedder *search.Vectorizer, qc *qdrant.Client, recording bool, stream *portaudio.Stream, in []int16,
+func RecordAudio(gc GcClient, embedder *search.Vectorizer, qc *qdrant.Client, recording bool, stream *portaudio.Stream, in []int16,
 	ctx context.Context, c *websocket.Conn,
 	messageChan chan any, errorChan chan error, stopChan chan struct{}) {
 
@@ -82,7 +82,14 @@ func RecordAudio(embedder *search.Vectorizer, qc *qdrant.Client, recording bool,
 		case msg := <-messageChan:
 			// voskutil.HandleVoskMessage(msg)
 			finalText := voskutil.HandleVoskMessage(msg)
-			GetOperation(qc, finalText, embedder)
+			operation := GetOperation(qc, finalText, embedder)
+			if operation == "List" {
+				gc.GetEventsForTheDay()
+			} else if operation == "Add" {
+				fmt.Println("Creating event...")
+			} else if operation == "Delete" {
+				fmt.Println("Deleting event...")
+			}
 		case err := <-errorChan:
 			if err != nil {
 				log.Printf("WebSocket error: %v", err)

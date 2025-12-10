@@ -9,7 +9,7 @@ import (
 	"github.com/qdrant/go-client/qdrant"
 )
 
-func GetOperation(qc *qdrant.Client, text *string, embedder *search.Vectorizer) {
+func GetOperation(qc *qdrant.Client, text *string, embedder *search.Vectorizer) string {
 	if text != nil {
 		embeddedMsg, err := embedder.EmbedText(*text)
 		if err != nil {
@@ -34,7 +34,9 @@ func GetOperation(qc *qdrant.Client, text *string, embedder *search.Vectorizer) 
 			if qdrantValue.GetStringValue() != "" {
 				operation := qdrantValue.GetStringValue()
 				fmt.Println(operation) // Prints: Delete
+				return operation
 			}
 		}
 	}
+	return ""
 }

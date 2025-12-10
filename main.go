@@ -9,12 +9,13 @@ import (
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/gordonklaus/portaudio"
-	"github.com/tommylay1902/vcalendar/voskutil"
+	"github.com/tommylay1902/vcalendar/seed"
 	"github.com/tommylay1902/vcalendar/wavwriter"
 )
 
 func main() {
-	// seed.SeedGCOperations()
+	gc := Initialize()
+	seed.SeedGCOperations()
 	IgnoreAudioWarnings()
 	qc := SetupQdrantClient()
 	embedder := SetupEmbeddingClient()
@@ -66,7 +67,8 @@ func main() {
 
 	fmt.Println("Recording started...")
 	recording := true
-	RecordAudio(embedder, qc, recording, stream, in, ctx,
+	// need to break up the logic in this, too many moving parts
+	RecordAudio(gc, embedder, qc, recording, stream, in, ctx,
 		c, messageChan, errorChan, stopChan)
 
 	// Send EOF to Vosk
@@ -74,24 +76,10 @@ func main() {
 		log.Printf("Error sending EOF: %v", err)
 	}
 
-	// Wait for final messages
-	fmt.Println("Waiting for final transcriptions...")
-	timeout := time.After(2 * time.Second)
-	for {
-		select {
-		case msg := <-messageChan:
-			voskutil.HandleVoskMessage(msg)
-		case <-timeout:
-			fmt.Println("Timeout waiting for final messages")
-			goto cleanup
-		case <-doneChan:
-			goto cleanup
-		}
-	}
-
-cleanup:
-	c.CloseNow()
-	fmt.Println("finished")
+	// cleanup:
+	//
+	//	c.CloseNow()
+	//	fmt.Println("finished")
 }
 
 func chk(err error) {

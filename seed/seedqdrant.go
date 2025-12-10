@@ -25,6 +25,9 @@ func SeedGCOperations() {
 	embedUpdate, err := m.EmbedText("Update event on my calendar")
 	index.Add(embedUpdate, "Update event from my calendar")
 
+	embedListEventsForToday, err := m.EmbedText("List events for today")
+	index.Add(embedListEventsForToday, "List events for today")
+
 	defer m.Close()
 
 	client, err := qdrant.NewClient(&qdrant.Config{
@@ -57,6 +60,11 @@ func SeedGCOperations() {
 				Id:      qdrant.NewIDNum(3),
 				Vectors: qdrant.NewVectors(embedUpdate...),
 				Payload: qdrant.NewValueMap(map[string]any{"operation": "Update"}),
+			},
+			{
+				Id:      qdrant.NewIDNum(4),
+				Vectors: qdrant.NewVectors(embedListEventsForToday...),
+				Payload: qdrant.NewValueMap(map[string]any{"operation": "List"}),
 			},
 		},
 	})
